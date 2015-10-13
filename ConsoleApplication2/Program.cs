@@ -16,13 +16,11 @@ namespace ConsoleApplication2
             double result;
 
             //This list gets two values from the user and stores them
-            List<double> compared = new List<double>();
-            compared.Add(GetValue("Value 1: "));
-            compared.Add(GetValue("Value 2: "));
-
-            //These doubles use the built-in comparing method to assign the larger and smaller of the numbers to the appropriate val.
-            double larger = compared.Max();
-            double smaller = compared.Min();
+            
+            var userNumbers = new List<double>();
+            userNumbers.Add(GetValue("Value 1: "));
+            userNumbers.Add(GetValue("Value 2: "));
+            var orderedUserNumbers = userNumbers.OrderByDescending(x => x);   
 
             while (true)
             {
@@ -35,35 +33,27 @@ namespace ConsoleApplication2
                 switch (operation)
                 {
                     case "A":
-                        Console.WriteLine("");
-                        Console.WriteLine("ADD");
-                        Console.WriteLine("");
-                        result = AddValues(larger, smaller);
+                        Console.WriteLine("\nADD\n");
+                        result = AddValues(orderedUserNumbers);
                         break;
 
                     case "S":
-                        Console.WriteLine("");
-                        Console.WriteLine("SUBTRACT");
-                        Console.WriteLine("");
+                        Console.WriteLine("\nSUBTRACT\n");
                         //SubDivKind determines if the larger or smaller number should be positioned before the minus symbol
                         //SubDivKind then calls the actual subtraction method with the correct value placement.
-                        result = SubDivKind(larger, smaller, "subtract");
+                        result = SubDivKind(orderedUserNumbers, true);
                         break;
 
                     case "M":
-                        Console.WriteLine("");
-                        Console.WriteLine("MULTIPLY");
-                        Console.WriteLine("");
-                        result = MultValues(larger, smaller);
+                        Console.WriteLine("\nMULTIPLY\n");
+                        result = MultValues(orderedUserNumbers);
                         break;
 
                     case "D":
-                        Console.WriteLine("");
-                        Console.WriteLine("DIVIDE");
-                        Console.WriteLine("");
+                        Console.WriteLine("\nDIVIDE\n");
                         //SubDivKind determines if the larger or smaller number should be positioned before the divison symbol
                         //SubDivKind then calls the actual division method with the correct value placement.
-                        result = SubDivKind(larger, smaller, "divide");
+                        result = SubDivKind(orderedUserNumbers, false);
                         break;
 
                     default:
@@ -79,58 +69,107 @@ namespace ConsoleApplication2
             Console.WriteLine("The answer is " + result);
         }
 
+        /// <summary>
+        /// This method uses a string to prompt the user for a double.
+        /// If the user input does not parse as a double, the user is prompted to enter a double
+        /// </summary>
+        /// <param name="label"></param>
+        /// <returns></returns>
         private static double GetValue(string label)
         {
-            double value;
+            double value = 0;
+            var isInvalid = true;
 
-            while (true)
+            while (isInvalid)
             {
                 Console.Write(label);
                 string input = Console.ReadLine();
-                if (Double.TryParse(input, out value))
-                {
-                    return value;
-                }
-                else
+                isInvalid = !Double.TryParse(input, out value);
+                if (isInvalid)
                 {
                     Console.WriteLine("That input does not parse as a number");
                 }
             }
+
+            return value;
         }
 
-        private static double AddValues(double value1, double value2)
+        /// <summary>
+        /// This method adds the first double in a list to the second double in the list
+        /// </summary>
+        /// <param name="numbers"></param>
+        /// <returns></returns>
+        private static double AddValues(List<double> numbers)
         {
-            Console.WriteLine("");
-            return value1 + value2;
+            Console.WriteLine("\n");
+            return numbers.ElementAt(0) + numbers.ElementAt(1);
         }
 
-        private static double SubValues(double value1, double value2)
+        /// <summary>
+        /// This method subtracts the first double in a list from the second double
+        /// </summary>
+        /// <param name="value1"></param>
+        /// <param name="value2"></param>
+        /// <returns></returns>
+        private static double SubValues(List<double> numbers)
         {
-            Console.WriteLine("");
-            Console.WriteLine(value1 + " subtracted from " + value2 + ":");
-            Console.WriteLine("");
+            double value1 = numbers.ElementAt(0);
+            double value2 = numbers.ElementAt(1);
+
+            Console.WriteLine("\n");
+            Console.WriteLine("{0} subtracted from {1}:", value1, value2);
+            Console.WriteLine("\n");
 
             return (value2 - value1);
         }
 
-        private static double MultValues(double value1, double value2)
+        /// <summary>
+        /// This method multiplies the first two doubles in a list and returns a double
+        /// </summary>
+        /// <param name="value1"></param>
+        /// <param name="value2"></param>
+        /// <returns></returns>
+        private static double MultValues(List<double> numbers)
         {
-            Console.WriteLine("");
-            return (value1 * value2);
+            Console.WriteLine("\n");
+            return (numbers.ElementAt(0) * numbers.ElementAt(1));
         }
 
-        private static double DivValues(double value1, double value2)
+
+        /// <summary>
+        /// This method takes two doubles in a list and returns the result of the first double / the second double
+        /// </summary>
+        /// <param name="value1">The larger number</param>
+        /// <param name="value2">The smaller number</param>
+        /// <returns>The result of value1 / value2</returns>
+        private static double DivValues(List<double> numbers)
         {
-            Console.WriteLine("");
-            return (value1 / value2);
+            Console.WriteLine("\n");
+            return (numbers.ElementAt(0) / numbers.ElementAt(1));
         }
 
-        private static double SubDivKind(double larger, double smaller, string thisOperation)
+        /// <summary>
+        /// This method takes two doubles and a bool that specifies whether the user wants to subtract or divide the numbers.
+        /// It requires user input to specify if the larger number should subtract/divide the smaller, or vice versa
+        /// </summary>
+        /// <param name="larger"></param>
+        /// <param name="smaller"></param>
+        /// <param name="shouldSubtract"></param>
+        /// <returns></returns>
+        private static double SubDivKind(List<double> orderedUserNumbers, bool shouldSubtract)
         {
-            //This section handles the grammer for the method strings
+            double result;
+
+            //This var controls the While cycle
+            bool whileCycle = true;
+
+            //This section takes the order list of doubles and assigns them to the appropriate vars for user interaction
+            double larger = orderedUserNumbers.ElementAt(0);
+            double smaller = orderedUserNumbers.ElementAt(1);
+
+            //This section handles the grammer for the user interaction strings
             string fromBy;
-            
-            if (thisOperation == "subtract")
+            if (shouldSubtract)
             {
                 fromBy = "from";
             }
@@ -140,57 +179,53 @@ namespace ConsoleApplication2
             }
 
             //This while loop ensures that the user submits the correct input when choosing which number to subtract from or divide by.
-            while (true)
+            while (whileCycle)
             {
                 //These if statements are a shortcut in case the entered numbers are the same.
                 //It's silly for the user to choose which to subtract/divide from which when the answer will always be the same.
-                if (larger == smaller && thisOperation == "subtract")
+                if (larger == smaller && shouldSubtract)
                 {
-                    return 0;
+                    result = 0;
+                    whileCycle = false;
                 }
-                if (larger == smaller && thisOperation == "divide")
+                if (larger == smaller && !shouldSubtract)
                 {
-                    return 1;
+                    result = 1;
+                    whileCycle = false;
                 }
                 else
                 {
-                    Console.WriteLine("");
-                    Console.WriteLine("");
-                    Console.WriteLine("Do you want to " + thisOperation + " " + larger + " " + fromBy + " " + smaller + "?");
-                    Console.WriteLine();
-                    Console.WriteLine("");
-                    Console.WriteLine("");
-                    Console.WriteLine("If you want to " + thisOperation + " " + larger + " " + fromBy + " " + smaller + " please press 'Y'");
-                    Console.WriteLine("");
-                    Console.WriteLine("If you want to " + thisOperation + " " + smaller + " " + fromBy + " " + larger + ", please press 'N'");
-                    Console.WriteLine("");
+                    Console.WriteLine("\n\nDo you want to {0} {1} {2} {3}?\n\n", SubtractOrDivide(shouldSubtract), larger, fromBy, smaller);
+                    Console.WriteLine("\nIf you want to {0} {1} {2} {3}, please press 'Y'", SubtractOrDivide(shouldSubtract), larger, fromBy, smaller);
+                    Console.WriteLine("\nIf you want to {0} {3} {2} {1}, please press 'Y\n", SubtractOrDivide(shouldSubtract), larger, fromBy, smaller);
+
                     ConsoleKeyInfo selection = Console.ReadKey();
                     string yesNo = selection.KeyChar.ToString().ToUpper();
 
-                    if (yesNo == "Y" && thisOperation == "subtract")
-                    {
-                        return SubValues(larger, smaller);
-                    }
-                    if (yesNo == "Y" && thisOperation == "divide")
-                    {
-                        return DivValues(larger, smaller);
-                    }
-                    if (yesNo == "N" && thisOperation == "subtract")
-                    {
-                        return SubValues(smaller, larger);
-                    }
-                    if (yesNo == "N" && thisOperation == "divide")
-                    {
-                        return DivValues(smaller, larger);
-                    }
-                    else
-                    {
-                        Console.WriteLine("");
-                        Console.WriteLine("Please select a valid option.");
-                    }
+                    string key = yesNo + SubtractOrDivide(shouldSubtract);
+
+                    var map = new Dictionary<string, double>();
+                    map.Add("Ysubtract", SubValues(orderedUserNumbers));
+                    map.Add("Nsubtract", SubValues(orderedUserNumbers));
+                    map.Add("Ydivide", DivValues(orderedUserNumbers));
+                    map.Add("Ndivide", DivValues(orderedUserNumbers));
+
+                    result = map.TryGetValue(key, out result);
+                    whileCycle = false;
+
+
                 }
             }
         }
-
+        /// <summary>
+        /// This is a boolean switch. If 'shouldSubtract' has previously been set to 'yes',
+        /// then it will return the string "subtract". If 'no', then "divide".
+        /// </summary>
+        /// <param name="shouldSubtract"></param>
+        /// <returns></returns>
+        public static string SubtractOrDivide(bool shouldSubtract)
+        {
+            return shouldSubtract ? "subtract" : "divide";
+        }
     }
 }
